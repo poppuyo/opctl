@@ -7,31 +7,31 @@ import (
   "github.com/opspec-io/sdk-golang/pkg/model"
 )
 
-func newStartOpRunHandler(
+func newStartOpHandler(
 core core.Core,
 ) http.Handler {
 
-  return &startOpRunHandler{
+  return &startOpHandler{
     core:core,
   }
 
 }
 
-type startOpRunHandler struct {
+type startOpHandler struct {
   core core.Core
 }
 
-func (this startOpRunHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (this startOpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-  startOpRunReq := model.StartOpRunReq{}
+  startOpReq := model.StartOpReq{}
 
-  err := json.NewDecoder(r.Body).Decode(&startOpRunReq)
+  err := json.NewDecoder(r.Body).Decode(&startOpReq)
   if (nil != err) {
     http.Error(w, err.Error(), http.StatusBadRequest)
     return
   }
 
-  opRunId, err := this.core.StartOpRun(startOpRunReq)
+  opInstanceId, err := this.core.StartOp(startOpReq)
   if (nil != err) {
     http.Error(w, err.Error(), http.StatusInternalServerError)
     return
@@ -40,7 +40,7 @@ func (this startOpRunHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
   w.WriteHeader(http.StatusCreated)
   w.Header().Set("Content-Type", "text/plain; charset=UTF-8")
 
-  w.Write([]byte(opRunId))
+  w.Write([]byte(opInstanceId))
   if (nil != err) {
     http.Error(w, err.Error(), http.StatusInternalServerError)
     return

@@ -5,8 +5,8 @@ package core
 import (
   "github.com/opspec-io/sdk-golang/pkg/model"
   "github.com/opspec-io/sdk-golang/pkg/bundle"
-  "github.com/opspec-io/engine/pkg/containerengine"
-  "github.com/opspec-io/engine/util/eventing"
+  "github.com/opspec-io/engine/pkg/containerprovider"
+  "github.com/opspec-io/engine/pkg/pubsubprovider"
   "github.com/opspec-io/engine/util/uniquestring"
   "github.com/opspec-io/engine/util/pathnormalizer"
 )
@@ -16,59 +16,90 @@ type Core interface {
   eventChannel chan model.Event,
   ) (err error)
 
-  KillOpRun(
-  req model.KillOpRunReq,
-  )
+  KillOp(
+  req model.KillOpReq,
+  ) (err error)
 
-  StartOpRun(
-  req model.StartOpRunReq,
+  StartOp(
+  req model.StartOpReq,
   ) (
-  opRunId string,
+  opInstanceId string,
   err error,
   )
 }
 
+const (
+  PubSubTopicIdPrefix = "opspec.engine"
+)
+
 func New(
-containerEngine containerengine.ContainerEngine,
+containerProvider containerprovider.ContainerProvider,
+pubSubProvider pubsubprovider.PubSubProvider,
 ) (core Core) {
 
-  /* factories */
   uniqueStringFactory := uniquestring.NewUniqueStringFactory()
-
-  /* components */
-  eventStream := eventing.NewEventStream()
 
   _bundle := bundle.New()
 
-  opRunRepo := newOpRunRepo()
+  opInstanceRepo := newOpInstanceRepo()
 
-  opRunner := newOpRunner(
-    containerEngine,
-    eventStream,
-    _bundle,
-    opRunRepo,
-    uniqueStringFactory,
-  )
+  // init pubsub
+  eventsPubSubTopic, err := pubSubProvider.CreateTopicIfNotExists(PubSubTopicIdPrefix + ".events")
+  if (nil != err) {
+    panic(err)
+  }
+  opKillsPubSubTopic, err := pubSubProvider.CreateTopicIfNotExists(PubSubTopicIdPrefix + ".opkills")
+  if (nil != err) {
+    panic(err)
+  }
+  opStartsPubSubTopic, err := pubSubProvider.CreateTopicIfNotExists(PubSubTopicIdPrefix + ".opstarts")
+  if (nil != err) {
+    panic(err)
+  }
+
+  newOpKiller(containerProvider, eventsPubSubTopic, opInstanceRepo, opKillsPubSubTopic).Start()
 
   core = &_core{
     bundle:_bundle,
-    containerEngine:containerEngine,
-    eventStream:eventStream,
-    opRunner:opRunner,
+    containerProvider:containerProvider,
+    eventsPubSubTopic:eventsPubSubTopic,
+    opKillsPubSubTopic:opKillsPubSubTopic,
+    opStartsPubSubTopic:opStartsPubSubTopic,
+    opInstanceRepo:opInstanceRepo,
     pathNormalizer:pathnormalizer.NewPathNormalizer(),
-    opRunRepo:opRunRepo,
+    pubSubProvider:pubSubProvider,
     uniqueStringFactory:uniqueStringFactory,
   }
-
   return
 }
 
 type _core struct {
   bundle              bundle.Bundle
-  containerEngine     containerengine.ContainerEngine
-  eventStream         eventing.EventStream
-  opRunner            opRunner
+  containerProvider   containerprovider.ContainerProvider
+  eventsPubSubTopic   pubsubprovider.Topic
+  opKillsPubSubTopic  pubsubprovider.Topic
+  opStartsPubSubTopic pubsubprovider.Topic
+  opInstanceRepo      opInstanceRepo
   pathNormalizer      pathnormalizer.PathNormalizer
-  opRunRepo           opRunRepo
+  pubSubProvider      pubsubprovider.PubSubProvider
   uniqueStringFactory uniquestring.UniqueStringFactory
+}
+
+func (this _core) KillOp(
+req model.KillOpReq,
+) (err error) {
+  opKillDescriptor := opKillDescriptor{req}
+  err = this.opKillsPubSubTopic.Publish(opKillDescriptor)
+  return
+}
+
+func (this _core) StartOp(
+req model.StartOpReq,
+) (
+opInstanceId string,
+err error,
+) {
+  opInstanceId = this.uniqueStringFactory.Construct()
+  this.opStartsPubSubTopic.Publish()
+  return
 }

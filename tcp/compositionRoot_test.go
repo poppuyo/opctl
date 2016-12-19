@@ -42,7 +42,7 @@ var _ = Describe("compositionRoot", func() {
     })
   })
 
-  Context("KillOpRunHandler()", func() {
+  Context("KillOpHandler()", func() {
     It("should not return nil", func() {
 
       /* arrange */
@@ -51,15 +51,15 @@ var _ = Describe("compositionRoot", func() {
       )
 
       /* act */
-      actualKillOpRunHandler := objectUnderTest.KillOpRunHandler()
+      actualKillOpHandler := objectUnderTest.KillOpHandler()
 
       /* assert */
-      Expect(actualKillOpRunHandler).NotTo(BeNil())
+      Expect(actualKillOpHandler).NotTo(BeNil())
 
     })
   })
 
-  Context("StartOpRunHandler()", func() {
+  Context("StartOpHandler()", func() {
     It("should not return nil", func() {
 
       /* arrange */
@@ -68,10 +68,10 @@ var _ = Describe("compositionRoot", func() {
       )
 
       /* act */
-      actualStartOpRunHandler := objectUnderTest.StartOpRunHandler()
+      actualStartOpHandler := objectUnderTest.StartOpHandler()
 
       /* assert */
-      Expect(actualStartOpRunHandler).NotTo(BeNil())
+      Expect(actualStartOpHandler).NotTo(BeNil())
 
     })
   })

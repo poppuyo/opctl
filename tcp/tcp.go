@@ -40,13 +40,13 @@ func (this _api) Start(
   ).Methods(http.MethodGet)
 
   router.Handle(
-    killOpRunRelUrlTemplate,
-    this.compositionRoot.KillOpRunHandler(),
+    killOpRelUrlTemplate,
+    this.compositionRoot.KillOpHandler(),
   ).Methods(http.MethodPost)
 
   router.Handle(
-    startOpRunRelUrlTemplate,
-    this.compositionRoot.StartOpRunHandler(),
+    startOpRelUrlTemplate,
+    this.compositionRoot.StartOpHandler(),
   ).Methods(http.MethodPost)
 
   http.ListenAndServe(":42224", router)

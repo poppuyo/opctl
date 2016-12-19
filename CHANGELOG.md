@@ -30,7 +30,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.1.6 - 2016-08-21
 ### Fixed
-- OpRunEnded event not sent on `Failed` outcome
+- OpEnded event not sent on `Failed` outcome
 
 ## 0.1.5 - 2016-08-02
 ### Added

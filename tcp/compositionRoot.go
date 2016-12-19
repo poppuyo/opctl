@@ -8,8 +8,8 @@ import (
 type compositionRoot interface {
   GetEventStreamHandler() http.Handler
   GetLivenessHandler() http.Handler
-  KillOpRunHandler() http.Handler
-  StartOpRunHandler() http.Handler
+  KillOpHandler() http.Handler
+  StartOpHandler() http.Handler
 }
 
 func newCompositionRoot(
@@ -19,8 +19,8 @@ coreApi core.Core,
   compositionRoot = &_compositionRoot{
     getEventStreamHandler:newGetEventStreamHandler(coreApi),
     getLivenessHandler:newGetLivenessHandler(),
-    killOpRunHandler:newKillOpRunHandler(coreApi),
-    startOpRunHandler:newStartOpRunHandler(coreApi),
+    killOpHandler:newKillOpHandler(coreApi),
+    startOpHandler:newStartOpHandler(coreApi),
   }
 
   return
@@ -30,8 +30,8 @@ coreApi core.Core,
 type _compositionRoot struct {
   getLivenessHandler    http.Handler
   getEventStreamHandler http.Handler
-  killOpRunHandler      http.Handler
-  startOpRunHandler          http.Handler
+  killOpHandler      http.Handler
+  startOpHandler          http.Handler
 }
 
 func (this _compositionRoot) GetLivenessHandler(
@@ -44,12 +44,12 @@ func (this _compositionRoot) GetEventStreamHandler(
   return this.getEventStreamHandler
 }
 
-func (this _compositionRoot) KillOpRunHandler(
+func (this _compositionRoot) KillOpHandler(
 ) http.Handler {
-  return this.killOpRunHandler
+  return this.killOpHandler
 }
 
-func (this _compositionRoot) StartOpRunHandler(
+func (this _compositionRoot) StartOpHandler(
 ) http.Handler {
-  return this.startOpRunHandler
+  return this.startOpHandler
 }

@@ -7,31 +7,31 @@ import (
   "github.com/opspec-io/sdk-golang/pkg/model"
 )
 
-func newKillOpRunHandler(
+func newKillOpHandler(
 core core.Core,
 ) http.Handler {
 
-  return &killOpRunHandler{
+  return &killOpHandler{
     core:core,
   }
 
 }
 
-type killOpRunHandler struct {
+type killOpHandler struct {
   core core.Core
 }
 
-func (this killOpRunHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (this killOpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-  killOpRunReq := model.KillOpRunReq{}
+  killOpReq := model.KillOpReq{}
 
-  err := json.NewDecoder(r.Body).Decode(&killOpRunReq)
+  err := json.NewDecoder(r.Body).Decode(&killOpReq)
   if (nil != err) {
     http.Error(w, err.Error(), http.StatusBadRequest)
     return
   }
 
-  this.core.KillOpRun(killOpRunReq)
+  this.core.KillOp(killOpReq)
 
   w.WriteHeader(http.StatusCreated)
   w.Header().Set("Content-Type", "text/plain; charset=UTF-8")

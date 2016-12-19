@@ -2,23 +2,23 @@ package tcp
 
 /* resources */
 const (
-  // resource: event-stream
+  // resource: a single event-stream
   eventStreamRelUrlTemplate string = "/event-stream"
 
   // resource: a single liveness
   livenessRelUrlTemplate string = "/liveness"
 
-  // resource: all op-runs
-  opRunKillsRelUrlTemplate string = "/op-run-kills"
+  // resource: all instance kills
+  opKillsRelUrlTemplate string = "/instances/kills"
 
-  // resource: all op-runs
-  opRunsRelUrlTemplate string = "/op-runs"
+  // resource: all instance starts
+  opStartsRelUrlTemplate string = "/instances/starts"
 )
 
 /* use cases */
 const (
   getLivenessRelUrlTemplate string = livenessRelUrlTemplate
   getEventStreamRelUrlTemplate string = eventStreamRelUrlTemplate
-  killOpRunRelUrlTemplate string = opRunKillsRelUrlTemplate
-  startOpRunRelUrlTemplate string = opRunsRelUrlTemplate
+  killOpRelUrlTemplate string = opKillsRelUrlTemplate
+  startOpRelUrlTemplate string = opStartsRelUrlTemplate
 )
